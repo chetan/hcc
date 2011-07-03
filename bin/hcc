@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+if File.exists? File.join(File.dirname(__FILE__), "../.git") then
+    require 'rubygems'
+    require File.join(File.dirname(__FILE__), "../lib/hcc")
+else
+    require 'rubygems'
+    require 'hcc'
+end
