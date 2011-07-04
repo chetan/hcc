@@ -21,7 +21,7 @@ module HCC
         end
 
         def prompt
-            [ "#{@user}@hadoop".colorize(:green), @path.colorize(:blue), "$ " ].join(" ")
+            [ "#{@user}@hadoop".colorize(:green), @path.colorize(:blue), "$ ".colorize(:blue) ].join(" ")
         end
 
         def exec(cmd)
