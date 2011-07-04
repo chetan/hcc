@@ -1,6 +1,8 @@
 
 require 'open4'
 
+# original code from gem 'arh'
+
 module HCC
     class Exec
 
