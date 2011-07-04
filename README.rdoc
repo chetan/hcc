@@ -1,6 +1,6 @@
 = hcc
 
-Description goes here.
+HADOOP command-line client
 
 == Contributing to hcc
  
