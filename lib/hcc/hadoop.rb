@@ -4,6 +4,7 @@ module HCC
     class Hadoop
 
         attr_reader :home, :uri, :user, :path
+        attr_reader :shell
 
         def initialize(opts={})
 
@@ -18,6 +19,16 @@ module HCC
                 exit
             end
 
+            # try to locate home dir if not set
+            if not @home then
+                h = "/usr/local/bin/hadoop"
+                h = File.readlink(h) if File.symlink? h
+
+                @home = h.gsub(%r{/bin/hadoop$}, '')
+            end
+
+            @shell = HCC::Shell.new(@home)
+
         end
 
         def prompt
@@ -29,7 +40,8 @@ module HCC
         end
 
         def run_cmd(str)
-            exec(cmd(str))
+            #exec(cmd(str))
+            @shell.run( str.split(/ /) )
         end
 
         def cmd(c=nil)
@@ -55,7 +67,8 @@ module HCC
             else
                 str = resolve_path(str)
             end
-            run_cmd("fs -ls #{@uri}#{str}")
+            #run_cmd("fs -ls #{@uri}#{str}")
+            run_cmd("-ls #{@uri}#{str}")
         end
 
         def cd(str)
