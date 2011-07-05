@@ -13,18 +13,28 @@ module HCC
             @uri  = opts[:uri] || "hdfs://localhost:9000/"
             @path = "/"
 
-            ret = exec(cmd())
-            if not (ret.exit_code == 1 and ret.stdout =~ /Usage:/) then
-                puts "hadoop command not available"
-                exit
-            end
+            # ret = exec(cmd())
+            # if not (ret.exit_code == 1 and ret.stdout =~ /Usage:/) then
+            #     puts "hadoop command not available"
+            #     exit
+            # end
 
             # try to locate home dir if not set
             if not @home then
-                h = "/usr/local/bin/hadoop"
+                h = `which hadoop`.strip
+                if h.empty? then
+                    puts "hadoop command not available"
+                    exit
+                end
                 h = File.readlink(h) if File.symlink? h
 
-                @home = h.gsub(%r{/bin/hadoop$}, '')
+                e = `grep 'export HADOOP_HOME' #{h}`
+                if e and e =~ /^export HADOOP_HOME=['"]?(.*)['"]?/ then
+                    @home = $1
+
+                elsif h =~ %r{/bin/hadoop$} then
+                    @home = h.gsub(%r{/bin/hadoop$}, '')
+                end
             end
 
             @shell = HCC::Shell.new(@home)
