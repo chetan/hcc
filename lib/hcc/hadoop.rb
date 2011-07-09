@@ -50,14 +50,28 @@ module HCC
             File.expand_path(str).squeeze("/")
         end
 
+        def uri(path=nil)
+            uri = @uri
+            if path then
+                if uri =~ %r{/$} and path =~ %r{^/} then
+                    uri += path[1, path.length]
+                elsif uri !~ %r{/$} and path !~ %r{^/} then
+                    uri += "/#{path}"
+                else
+                    uri += path
+                end
+            end
+            uri
+        end
+
         def ls(str=nil)
             if str.nil? or str.strip.empty?
-                str = @path
+                path = @path
             else
-                str = resolve_path(str)
+                path = resolve_path(str)
             end
-            #run_cmd("fs -ls #{@uri}#{str}")
-            run_cmd("-ls #{@uri}#{str}")
+            #run_cmd("fs -ls #{@uri}#{path}")
+            run_cmd("-ls #{uri(path)}")
         end
 
         def cd(str)
