@@ -5,10 +5,10 @@ module HCC
 
     class Output
 
-        attr_reader :stdout
-        attr_reader :stderr
+        attr_reader :cmd, :stdout, :stderr
 
-        def initialize(stdout, stderr)
+        def initialize(cmd, stdout, stderr)
+            @cmd    = cmd
             @stdout = stdout
             @stderr = stderr
         end
@@ -37,7 +37,7 @@ module HCC
             out, err = capture_output do
                 @shell.run(cmd)
             end
-            Output.new(out, err)
+            Output.new(cmd.join(" "), out, err)
         end
 
         def capture_output
