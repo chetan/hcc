@@ -10,11 +10,11 @@ class Cinatra
     end
 end
 
-puts "hadoop command-line client v#{HCC::VERSION}"
-puts "type 'help' for help"
-
 HADOOP = HCC::Hadoop.new
 @hadoop = HADOOP
+
+puts "hadoop command-line client v#{HCC::VERSION}"
+puts "type 'help' for help"
 
 command 'ls' do |arg|
     ret = @hadoop.ls(arg)

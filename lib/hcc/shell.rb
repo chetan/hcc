@@ -66,6 +66,12 @@ module HCC
         end
 
         def load_rjb()
+
+            if not ENV["JAVA_HOME"] then
+                puts "JAVA_HOME not set! export or pass with --java_home"
+                exit
+            end
+
             jars = get_jars(File.join(@home)) + get_jars(File.join(@home, "lib"))
             @classpath = jars.join(":")
 
