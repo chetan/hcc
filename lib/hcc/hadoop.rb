@@ -20,34 +20,6 @@ module HCC
             @shell = HCC::Shell.new(@home)
         end
 
-        def locate_hdfs
-            conf = "/etc/hadoop/conf/core-site.xml"
-            if File.exists? conf then
-                if `grep 'hdfs://' #{conf}` =~ %r{<value>(.*?)</value>} then
-                    @uri = $1
-                    return
-                end
-            end
-            @uri = "hdfs://localhost:9000/"
-        end
-
-        def locate_home_dir
-            h = `which hadoop`.strip
-            if h.empty? then
-                puts "hadoop command not available"
-                exit
-            end
-            h = File.readlink(h) if File.symlink? h
-
-            e = `grep 'export HADOOP_HOME' #{h}`
-            if e and e =~ /^export HADOOP_HOME=['"]?(.*)['"]?/ then
-                @home = $1
-
-            elsif h =~ %r{/bin/hadoop$} then
-                @home = h.gsub(%r{/bin/hadoop$}, '')
-            end
-        end
-
         def prompt
             [ "#{@user}@hadoop".colorize(:green), @path.colorize(:blue), "$ ".colorize(:blue) ].join(" ")
         end
@@ -94,6 +66,37 @@ module HCC
             @path = resolve_path(str)
             #puts "new path: #{@path}"
             ret
+        end
+
+
+        private
+
+        def locate_hdfs
+            conf = "/etc/hadoop/conf/core-site.xml"
+            if File.exists? conf then
+                if `grep 'hdfs://' #{conf}` =~ %r{<value>(.*?)</value>} then
+                    @uri = $1
+                    return
+                end
+            end
+            @uri = "hdfs://localhost:9000/"
+        end
+
+        def locate_home_dir
+            h = `which hadoop`.strip
+            if h.empty? then
+                puts "hadoop command not available"
+                exit
+            end
+            h = File.readlink(h) if File.symlink? h
+
+            e = `grep 'export HADOOP_HOME' #{h}`
+            if e and e =~ /^export HADOOP_HOME=['"]?(.*)['"]?/ then
+                @home = $1
+
+            elsif h =~ %r{/bin/hadoop$} then
+                @home = h.gsub(%r{/bin/hadoop$}, '')
+            end
         end
 
     end
