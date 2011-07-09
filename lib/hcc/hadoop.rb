@@ -10,35 +10,42 @@ module HCC
 
             @home = opts[:home] || ENV["HADOOP_HOME"]
             @user = opts[:user] || `whoami`.strip
-            @uri  = opts[:uri] || "hdfs://localhost:9000/"
+            @uri  = opts[:uri]
             @path = "/"
 
-            # ret = exec(cmd())
-            # if not (ret.exit_code == 1 and ret.stdout =~ /Usage:/) then
-            #     puts "hadoop command not available"
-            #     exit
-            # end
-
             # try to locate home dir if not set
-            if not @home then
-                h = `which hadoop`.strip
-                if h.empty? then
-                    puts "hadoop command not available"
-                    exit
-                end
-                h = File.readlink(h) if File.symlink? h
-
-                e = `grep 'export HADOOP_HOME' #{h}`
-                if e and e =~ /^export HADOOP_HOME=['"]?(.*)['"]?/ then
-                    @home = $1
-
-                elsif h =~ %r{/bin/hadoop$} then
-                    @home = h.gsub(%r{/bin/hadoop$}, '')
-                end
-            end
+            locate_home_dir if not @home
+            locate_hdfs if not @uri
 
             @shell = HCC::Shell.new(@home)
+        end
 
+        def locate_hdfs
+            conf = "/etc/hadoop/conf/core-site.xml"
+            if File.exists? conf then
+                if `grep 'hdfs://' #{conf}` =~ %r{<value>(.*?)</value>} then
+                    @uri = $1
+                    return
+                end
+            end
+            @uri = "hdfs://localhost:9000/"
+        end
+
+        def locate_home_dir
+            h = `which hadoop`.strip
+            if h.empty? then
+                puts "hadoop command not available"
+                exit
+            end
+            h = File.readlink(h) if File.symlink? h
+
+            e = `grep 'export HADOOP_HOME' #{h}`
+            if e and e =~ /^export HADOOP_HOME=['"]?(.*)['"]?/ then
+                @home = $1
+
+            elsif h =~ %r{/bin/hadoop$} then
+                @home = h.gsub(%r{/bin/hadoop$}, '')
+            end
         end
 
         def prompt
@@ -85,7 +92,7 @@ module HCC
             ret = ls(str)
             return ret if ret.error? # don't update path
             @path = resolve_path(str)
-            puts "new path: #{@path}"
+            #puts "new path: #{@path}"
             ret
         end
 
