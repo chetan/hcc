@@ -1,5 +1,6 @@
 
 require 'rjb'
+require 'tempfile'
 
 module HCC
 
@@ -42,23 +43,20 @@ module HCC
 
         def capture_output
 
-            ord, owr = IO.pipe
+            newout = Tempfile.new("shell-")
             oldout = STDOUT.dup
-            STDOUT.reopen owr
+            STDOUT.reopen newout
 
-            erd, ewr = IO.pipe
+            newerr = Tempfile.new("shell-")
             olderr = STDERR.dup
-            STDERR.reopen ewr
+            STDERR.reopen newerr
 
             yield
 
             STDOUT.reopen oldout
             STDERR.reopen olderr
 
-            owr.close
-            ewr.close
-
-            [ ord.read, erd.read ]
+            [ File.new(newout.path).read, File.new(newerr.path).read ]
 
         ensure
             STDOUT.reopen oldout
