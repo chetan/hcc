@@ -91,6 +91,11 @@ module HCC
             run_cmd("-du #{uri(path)}")
         end
 
+        def cat(str)
+            path = resolve_path(str)
+            run_cmd("-cat #{uri(path)}")
+        end
+
 
         private
 

@@ -1,6 +1,7 @@
 
 require 'cinatra'
 require 'colorize'
+require 'tempfile'
 
 class Cinatra
     def start
@@ -97,8 +98,33 @@ module HCC
             end
         end
 
+        def cmd_cat(arg)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.cat(cmd.paths)
+            if ret.error? and ret.stderr =~ /No such file or directory/ then
+                puts ret.stderr
+                return
+            end
+            if cmd.pipe? then
+                pipe_to(ret.stdout, cmd.pipe)
+            else
+                puts ret.stdout
+            end
+        end
+
 
         private
+
+        # cat test/in/tiny.txt
+        def pipe_to(output, cmd)
+            t = Tempfile.new("hcc-pipe-")
+            t.write(output)
+            t.close
+            fork do
+                exec("cat #{t.path} | #{cmd}")
+            end
+            Process.wait
+        end
 
         def to_human_readable(n)
             n = n.to_i
@@ -114,16 +140,20 @@ module HCC
 
         def register_commands
 
-            command 'ls', "list files in path; ls [<path>]" do |arg|
+            command 'ls', "list files in path; ls [path]" do |arg|
                 cmd_ls(arg)
             end
 
-            command 'cd', "change working directory; cd [<path>]" do |arg|
+            command 'cd', "change working directory; cd [path]" do |arg|
                 cmd_cd(arg)
             end
 
-            command 'du', "disk usage summary; du [-h] [<path>]" do |arg|
+            command 'du', "disk usage summary; du [-h] [path ...]" do |arg|
                 cmd_du(arg)
+            end
+
+            command 'cat', "Copies source paths to stdout; cat path [path ...]" do |arg|
+                cmd_cat(arg)
             end
 
         end
