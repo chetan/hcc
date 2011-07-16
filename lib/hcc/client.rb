@@ -114,15 +114,15 @@ module HCC
 
         def register_commands
 
-            command 'ls' do |arg|
+            command 'ls', "list files in path; ls [<path>]" do |arg|
                 cmd_ls(arg)
             end
 
-            command 'cd' do |arg|
+            command 'cd', "change working directory; cd [<path>]" do |arg|
                 cmd_cd(arg)
             end
 
-            command 'du' do |arg|
+            command 'du', "disk usage summary; du [-h] [<path>]" do |arg|
                 cmd_du(arg)
             end
 
