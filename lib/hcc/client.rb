@@ -30,7 +30,9 @@ module HCC
 
         def cmd_ls(arg)
 
-            ret = @hadoop.ls(arg)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.ls(cmd.paths)
+
             if ret.error? then
                 if ret.stderr =~ /No such file or directory/ then
                     puts ret.stderr
@@ -39,24 +41,27 @@ module HCC
                 end
                 return
             end
-            c = 0
-            ret.stdout.split(/\n/).each do |f|
-                c += 1
-                if c == 1
-                    puts f
-                    next
-                end
-                # TODO: handle filenames with spaces (possibly multiple spaces)
-                s = f.split(/\s+/)
-                (perm, repl, user, group, size, date, time) = s
-                file = s[7..s.length].join(" ")
-                file.sub!(@hadoop.path + "/", '')
-                if perm =~ /^d/ then
-                    file = file.colorize(:blue)
-                end
-                puts [perm, repl, user, group, size, date, time, file].join("\t")
 
-            end
+            write_output(cmd) do
+                c = 0
+                ret.stdout.split(/\n/).each do |f|
+                    c += 1
+                    if c == 1
+                        puts f
+                        next
+                    end
+                    # TODO: handle filenames with spaces (possibly multiple spaces)
+                    s = f.split(/\s+/)
+                    (perm, repl, user, group, size, date, time) = s
+                    file = s[7..s.length].join(" ")
+                    file.sub!(@hadoop.path + "/", '')
+                    if perm =~ /^d/ then
+                        file = file.colorize(:blue)
+                    end
+                    puts [perm, repl, user, group, size, date, time, file].join("\t")
+
+                end
+            end # write_output
 
         end
 
@@ -114,9 +119,10 @@ module HCC
         def write_output(cmd, ret=nil, &block)
 
             if block_given? then
-                ret = capture_output do
+                out, err = capture_output do
                     yield
                 end
+                ret = Output.new(nil, out, err)
             end
 
             if cmd.pipe? then
