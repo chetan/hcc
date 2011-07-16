@@ -82,6 +82,15 @@ module HCC
             ret
         end
 
+        def du(str=nil)
+            if str.nil? or str.empty? then
+                path = @path
+            else
+                path = resolve_path(str)
+            end
+            run_cmd("-du #{uri(path)}")
+        end
+
 
         private
 
