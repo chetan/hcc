@@ -105,15 +105,28 @@ module HCC
                 puts ret.stderr
                 return
             end
-            if cmd.pipe? then
-                pipe_to(ret.stdout, cmd.pipe)
-            else
-                puts ret.stdout
-            end
+            write_output(cmd, ret)
         end
 
 
         private
+
+        def write_output(cmd, ret=nil, &block)
+
+            if block_given? then
+                ret = capture_output do
+                    yield
+                end
+            end
+
+            if cmd.pipe? then
+                pipe_to(ret.stdout, cmd.pipe)
+            else
+                puts ret.stdout
+                puts ret.stderr
+            end
+
+        end
 
         # cat test/in/tiny.txt
         def pipe_to(output, cmd)
