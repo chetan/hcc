@@ -28,17 +28,17 @@ module HCC
             HCC::Exec.execute(cmd)
         end
 
-        def run_cmd(str)
-            #exec(cmd(str))
-            @shell.run( str.split(/ /) )
-        end
-
         def cmd(c=nil)
             cmd = ""
             cmd = "#{@home}/bin/" if @home
             cmd += "hadoop"
             cmd += " #{c}" if c
             cmd
+        end
+
+        def run_cmd(str)
+            #exec(cmd(str))
+            @shell.run( str.split(/ /) )
         end
 
         def resolve_path(str)
@@ -81,7 +81,6 @@ module HCC
             ret = ls(str)
             return ret if ret.error? # don't update path
             @path = resolve_path(str)
-            #puts "new path: #{@path}"
             ret
         end
 
