@@ -28,10 +28,10 @@ module HCC
 
         end
 
-        def cmd_ls(arg)
+        def cmd_ls(arg, recursive=false)
 
             cmd = HCC::Command.new(arg)
-            ret = @hadoop.ls(cmd.paths)
+            ret = @hadoop.ls(cmd.paths, recursive)
 
             if ret.error? then
                 if ret.stderr =~ /No such file or directory/ then
@@ -163,6 +163,10 @@ module HCC
 
             command 'ls', "list files in path; ls [path]" do |arg|
                 cmd_ls(arg)
+            end
+
+            command 'lsr', "list files in path, recursively; lsr [path]" do |arg|
+                cmd_ls(arg, true)
             end
 
             command 'cd', "change working directory; cd [path]" do |arg|

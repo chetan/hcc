@@ -64,14 +64,17 @@ module HCC
             uri
         end
 
-        def ls(str=nil)
+        def ls(str=nil, recursive=false)
             if str.nil? or str.strip.empty?
                 path = @path
             else
                 path = resolve_path(str)
             end
-            #run_cmd("fs -ls #{@uri}#{path}")
-            run_cmd("-ls #{uri(path)}")
+            if recursive then
+                run_cmd("-lsr #{uri(path)}")
+            else
+                run_cmd("-ls #{uri(path)}")
+            end
         end
 
         def cd(str)
