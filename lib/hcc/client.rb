@@ -62,7 +62,6 @@ module HCC
 
                 end
             end # write_output
-
         end
 
         def cmd_cd(arg)
@@ -118,6 +117,7 @@ module HCC
 
         private
 
+
         def write_output(cmd, ret=nil, &block)
 
             if block_given? then
@@ -130,8 +130,8 @@ module HCC
             if cmd.pipe? then
                 pipe_to(ret.stdout, cmd.pipe)
             else
-                puts ret.stdout
-                puts ret.stderr
+                print ret.stdout
+                print ret.stderr
             end
 
         end
