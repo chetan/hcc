@@ -98,6 +98,11 @@ module HCC
             run_cmd("-cat #{uri(path)}")
         end
 
+        def mkdir(str)
+            path = resolve_path(str)
+            run_cmd("-mkdir #{uri(path)}")
+        end
+
 
         private
 

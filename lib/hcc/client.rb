@@ -114,6 +114,16 @@ module HCC
             write_output(cmd, ret)
         end
 
+        def cmd_mkdir(arg)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.mkdir(cmd.paths)
+            if ret.error? then
+                puts ret.stderr
+                return
+            end
+            write_output(cmd, ret)
+        end
+
 
         private
 
@@ -179,6 +189,12 @@ module HCC
 
             command 'cat', "Copies source paths to stdout; cat path [path ...]" do |arg|
                 cmd_cat(arg)
+            end
+
+            # destructive commands
+
+            command 'mkdir', "creates the given directories; mkdir path [path ...]" do |arg|
+                cmd_mkdir(arg)
             end
 
         end
