@@ -103,6 +103,15 @@ module HCC
             run_cmd("-mkdir #{uri(path)}")
         end
 
+        def rm(str, recursive=false)
+            path = resolve_path(str)
+            if recursive then
+                run_cmd("-rmr #{uri(path)}")
+            else
+                run_cmd("-rm #{uri(path)}")
+            end
+        end
+
 
         private
 

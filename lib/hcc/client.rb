@@ -124,6 +124,16 @@ module HCC
             write_output(cmd, ret)
         end
 
+        def cmd_rm(arg, recursive=false)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.rm(cmd.paths, recursive)
+            if ret.error? then
+                puts ret.stderr
+                return
+            end
+            write_output(cmd, ret)
+        end
+
 
         private
 
@@ -195,6 +205,14 @@ module HCC
 
             command 'mkdir', "creates the given directories; mkdir path [path ...]" do |arg|
                 cmd_mkdir(arg)
+            end
+
+            command 'rm', "delete files specified as args; rm path [path ...]" do |arg|
+                cmd_rm(arg)
+            end
+
+            command 'rmr', "recursively delete files specified as args; rmr path [path ...]" do |arg|
+                cmd_rm(arg, true)
             end
 
         end
