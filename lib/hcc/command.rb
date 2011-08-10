@@ -3,11 +3,12 @@ module HCC
 
     class Command
 
-        attr_reader :flags, :paths, :pipe, :args
+        attr_reader :flags, :paths, :pipe, :raw
 
         def initialize(args=nil)
 
             @flags = []
+            @raw = args
 
             return if args.nil?
 
