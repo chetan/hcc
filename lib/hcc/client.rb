@@ -134,6 +134,23 @@ module HCC
             write_output(cmd, ret)
         end
 
+        def cmd_setrep(arg)
+            cmd = HCC::Command.new(arg)
+            if cmd.paths !~ /^\s*(\d+)\s+(.*)$/ then
+                puts "setrep: invalid arguments; try 'help setrep'"
+                return
+            end
+            repl = $1
+            path = $2
+            recursive = (cmd.flags.include? "-R" or cmd.flags.include? "-r")
+            ret = @hadoop.setrep(repl, path, recursive)
+            if ret.error? then
+                puts ret.stderr
+                return
+            end
+            write_output(cmd, ret)
+        end
+
 
         private
 
@@ -213,6 +230,10 @@ module HCC
 
             command 'rmr', "recursively delete files specified as args; rmr path [path ...]" do |arg|
                 cmd_rm(arg, true)
+            end
+
+            command 'setrep', "changes the replication factor of a file; setrep [-R] <repl factor> path" do |arg|
+                cmd_setrep(arg)
             end
 
         end

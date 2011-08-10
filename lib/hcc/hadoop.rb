@@ -112,6 +112,15 @@ module HCC
             end
         end
 
+        def setrep(repl, path, recursive=false)
+            path = resolve_path(path)
+            if recursive then
+                run_cmd("-setrep -R #{repl} #{uri(path)}")
+            else
+                run_cmd("-setrep #{repl} #{uri(path)}")
+            end
+        end
+
 
         private
 
