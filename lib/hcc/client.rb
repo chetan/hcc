@@ -151,6 +151,26 @@ module HCC
             write_output(cmd, ret)
         end
 
+        def cmd_put(arg)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.put(cmd.paths)
+            if ret.error? then
+                puts ret.stderr
+                return
+            end
+            write_output(cmd, ret)
+        end
+
+        def cmd_get(arg)
+            cmd = HCC::Command.new(arg)
+            ret = @hadoop.get(cmd.paths)
+            if ret.error? then
+                puts ret.stderr
+                return
+            end
+            write_output(cmd, ret)
+        end
+
 
         private
 
@@ -214,7 +234,7 @@ module HCC
                 cmd_du(arg)
             end
 
-            command 'cat', "Copies source paths to stdout; cat path [path ...]" do |arg|
+            command 'cat', "copies source paths to stdout; cat path [path ...]" do |arg|
                 cmd_cat(arg)
             end
 
@@ -234,6 +254,14 @@ module HCC
 
             command 'setrep', "changes the replication factor of a file; setrep [-R] <repl factor> path" do |arg|
                 cmd_setrep(arg)
+            end
+
+            command 'put', "copy one or more files to the given remote path; put <local file> [...] <remote dest>" do |arg|
+                cmd_put(arg)
+            end
+
+            command 'get', "copy one or more files to the given local path; put <remote file> <local dest>" do |arg|
+                cmd_get(arg)
             end
 
         end

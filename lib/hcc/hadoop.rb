@@ -121,6 +121,18 @@ module HCC
             end
         end
 
+        def put(str)
+            paths = str.split(/ +/)
+            dest = resolve_path(paths.pop)
+            run_cmd("-put #{paths.join(' ')} #{uri(dest)}")
+        end
+
+        def get(str)
+            paths = str.split(/ +/)
+            src = resolve_path(paths.shift)
+            run_cmd("-get #{uri(src)} #{paths.join(' ')}")
+        end
+
 
         private
 
