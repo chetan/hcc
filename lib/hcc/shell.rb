@@ -53,21 +53,31 @@ module HCC
             end
 
             local_lib = File.expand_path(File.join(File.dirname(__FILE__), "../../lib-java"))
-            jars = get_jars(@home) + get_jars(File.join(@home, "lib")) + get_jars(local_lib)
+            jars = get_jars(@home, File.join(@home, "lib"), File.join(@home, "client"), local_lib)
             @classpath = jars.join(":")
 
-            Rjb::load(@classpath)
-            shellclass = Rjb::import('hcc.RubyFsShell')
-            @shell = shellclass.new( Rjb::import('org.apache.hadoop.conf.Configuration').new )
+            Rjb::load(@classpath, [ "-Dlog4j.configuration=/root/hcc/log4j.properties"] )
+            conf = Rjb::import('org.apache.hadoop.conf.Configuration').new
+
+            [ File.join(@home, "etc/hadoop/core-site.xml"),
+              "/etc/hadoop/conf/core-site.xml" ].each do |p|
+
+                next if not File.directory? p
+                path = Rjb::import('org.apache.hadoop.fs.Path').new(p)
+                conf._invoke("addResource", "Lorg.apache.hadoop.fs.Path;", path)
+            end
+            @shell = Rjb::import('hcc.RubyFsShell').new(conf)
         end
 
-        def get_jars(path)
+        def get_jars(*paths)
             jars = []
-            return jars if not File.directory? path
-            Dir.entries(path).each do |f|
-                f = File.join(path, f)
-                next if not File.file? f or not f =~ /\.jar$/
-                jars << f
+            paths.each do |path|
+                next if not File.directory? path
+                Dir.entries(path).each do |f|
+                    f = File.join(path, f)
+                    next if not File.file? f or not f =~ /\.jar$/
+                    jars << f
+                end
             end
             jars
         end
