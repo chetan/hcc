@@ -58,6 +58,7 @@ module HCC
 
         def get_jars(path)
             jars = []
+            return jars if not File.directory? path
             Dir.entries(path).each do |f|
                 f = File.join(path, f)
                 next if not File.file? f or not f =~ /\.jar$/
