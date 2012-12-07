@@ -37,9 +37,9 @@ module HCC
                 if ret.stderr =~ /No such file or directory/ then
                     puts ret.stderr
                 else
-                    puts "error running command: #{ret.cmd} - #{ret.stderr}"
+                    puts "error running command (exit code: #{ret.code}): #{ret.cmd} - \n#{ret.stderr}"
                 end
-                return
+                return if ret.stdout.nil? or ret.stdout.empty?
             end
 
             write_output(cmd) do
@@ -181,7 +181,7 @@ module HCC
                 out, err = capture_output do
                     yield
                 end
-                ret = Output.new(nil, out, err)
+                ret = Output.new(nil, out, err, 0)
             end
 
             if cmd.pipe? then
