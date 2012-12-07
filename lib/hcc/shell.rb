@@ -6,25 +6,28 @@ module HCC
 
     class Output
 
-        attr_reader :cmd, :stdout, :stderr
+        attr_reader :cmd, :stdout, :stderr, :code
 
-        def initialize(cmd, stdout, stderr)
+        def initialize(cmd, stdout, stderr, code)
             @cmd    = cmd
             @stdout = stdout
             @stderr = stderr
+            @code   = code
         end
 
         def success?
-            @stderr.empty?
+            @code == 0
         end
 
         def error?
-            not @stderr.empty?
+            @code != 0
         end
 
     end
 
     class Shell
+
+        attr_reader :shell
 
         def initialize(hadoop_home)
 
@@ -35,10 +38,11 @@ module HCC
 
         # returns Output class
         def run(cmd)
+            code = 0
             out, err = capture_output do
-                @shell.run(cmd)
+                code = @shell.run(cmd)
             end
-            Output.new(cmd.join(" "), out, err)
+            Output.new(cmd.join(" "), out, err, code)
         end
 
         def load_rjb()
@@ -48,11 +52,12 @@ module HCC
                 exit
             end
 
-            jars = get_jars(File.join(@home)) + get_jars(File.join(@home, "lib"))
+            local_lib = File.expand_path(File.join(File.dirname(__FILE__), "../../lib-java"))
+            jars = get_jars(@home) + get_jars(File.join(@home, "lib")) + get_jars(local_lib)
             @classpath = jars.join(":")
 
             Rjb::load(@classpath)
-            shellclass = Rjb::import('org.apache.hadoop.fs.FsShell')
+            shellclass = Rjb::import('hcc.RubyFsShell')
             @shell = shellclass.new( Rjb::import('org.apache.hadoop.conf.Configuration').new )
         end
 
