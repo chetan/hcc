@@ -10,7 +10,7 @@ module HCC
 
             @home = opts[:home] || ENV["HADOOP_HOME"]
             @user = opts[:user] || `whoami`.strip
-            @uri  = opts[:uri]
+            @uri  = opts[:uri]  || ENV["HDFS_URI"]
             @path = "/"
 
             # try to locate home dir if not set
